@@ -1,11 +1,19 @@
-const econ = require('../../economy')
-module.exports = {
-    commands: ["balance", "bal"],
-    argMax: 1,
-    description: "Retrieves your or mentioned user balance",
-    args: ["[User @ (mention)]"],
-    permissions: [],
-    callback: async (message) => {
+const Commando = require('discord.js-commando')
+const econ = require('@features/economy')
+
+module.exports = class Balance extends Commando.Command {
+    constructor(client) {
+        super(client, {
+            name: "balance",
+            aliases: ["bal"],
+            group: 'economy',
+            memberName: 'balance',
+            description: "Retrieves your or mentioned user balance",
+            argsType: 'multiple',
+        })
+    }
+
+    async run(message) {
         const target = message.mentions.users.first() || message.author
         const targetID = target.id
 

@@ -1,9 +1,9 @@
-const welcomeModel = require('./models/WelcomeData')
+const farewellModel = require('@models/FarewellData')
 
 module.exports = (client) => {
 
-    client.on('guildMemberAdd', async member => {
-        const msg = await welcomeModel.findOne({ _id: member.guild.id }).exec()
+    client.on('guildMemberRemove', async member => {
+        const msg = await farewellModel.findOne({ _id: member.guild.id }).exec()
         if (msg) {
             const channel = member.guild.channels.cache.get(msg.channelId)
             const text = msg.text.replace(/<@>/g, `<@${member.id}>`)

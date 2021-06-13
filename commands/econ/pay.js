@@ -1,17 +1,36 @@
-const econ = require('../../economy')
+const Commando = require('discord.js-commando')
+const econ = require('@features/economy')
 
-module.exports = {
-    commands: ["pay"],
-    argMin: 2, 
-    argMax: 2,
-    args: ["<User @ (mention)>", "<Coins to pay>"],
-    permissions: [],
-    callback: async (message, arguments, text) => {
+module.exports = class Pay extends Commando.Command {
+    constructor(client) {
+        super(client, {
+            name: 'pay',
+            group: 'economy',
+            memberName: 'pay',
+            argsCount: 2,
+            // argsType: 'multiple',
+            description: "Pay Money to a User",
+            args: [
+                {
+                    key: 'user',
+                    prompt: '<User @ (mention)>',
+                    type: 'string'
+                },
+                {
+                    key: 'coins',
+                    prompt: '<Coins to pay>',
+                    type: 'string'
+                }
+            ],
+        })
+    }
+
+    async run(message, args) {
         const { guild, member } = message
 
         const target = message.mentions.users.first()
         if (!target) return message.reply("Please tag a user to send coins")
-        const coins = Number(arguments[1])
+        const coins = Number(args['coins'])
 
         if (isNaN(coins)) return message.reply("Please provide a valid number of coins")
         const myCoins = await econ.getWalletBalance(guild.id, member.id)

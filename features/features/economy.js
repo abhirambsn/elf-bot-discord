@@ -1,4 +1,4 @@
-const profileModel = require('./models/profile')
+const profileModel = require('@models/profile')
 
 let coinCache = {}
 let bankCache = {}

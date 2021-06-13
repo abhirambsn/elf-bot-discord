@@ -1,27 +1,48 @@
-const welcomeModel = require('../../models/WelcomeData')
+const Commando = require('discord.js-commando')
+const welcomeModel = require('@models/WelcomeData')
 
-module.exports = {
-    commands: ['setwelcome'],
-    description: "Set\'s the welcome message for the server",
-    permissions: ["ADMINISTRATOR"],
-    args: ["<Channel Name (mention)>", "<Welcome message>"],
-    minArg: 2,
-    maxArg: 2,
-    permissionError: "Only Admins can use this command",
-    callback: async (message, arguments, text) => {
-        const channel = message.guild.channels.cache.get(arguments[0].replace(/</g, '').replace(/#/g, '').replace(/>/g, ''))
+module.exports = class SetWelcome extends Commando.Command {
+    constructor(client) {
+        super(client, {
+            name: 'setwelcome',
+            description: 'Set\'s the welcome message for the server',
+            group: 'server',
+            memberName: 'setwelcome',
+            argsCount: 2,
+            clientPermissions: [
+                'ADMINISTRATOR'
+            ],
+            userPermissions: [
+                'ADMINISTRATOR'
+            ],
+            args: [
+                {
+                    key: 'channel',
+                    prompt: 'Channel Name (mention)',
+                    type: 'string'
+                },
+                {
+                    key: 'message',
+                    prompt: 'Welcome message',
+                    type: 'string'
+                }
+            ]
+        })
+    }
+
+    async run(message, args) {
+        const channel = message.guild.channels.cache.get(args.channel.replace(/</g, '').replace(/#/g, '').replace(/>/g, ''))
         const curMsg = await welcomeModel.findOne({ _id: message.guild.id }).exec()
-        arguments.shift()
         if (!curMsg) {
             const newMsg = await welcomeModel.create({
                 _id: message.guild.id,
                 channelId: channel.id,
-                text: arguments.join(' ')
+                text: args.message
             })
             newMsg.save()
         } else {
             curMsg.channelId = channel.id
-            curMsg.text = arguments.join(' ')
+            curMsg.text = args.message
             curMsg.save()
         }
         message.reply(`Welcome message has been set`)
